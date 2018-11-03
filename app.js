@@ -145,7 +145,7 @@ app.delete("/blogs/:id", function(req, res){
 });
 
 function deleteBlog(id, res){
-    Blog.findByIdAndDelete(id, function (err, callback) {
+    Blog.findByIdAndDelete(id, function (err) {
         if(!err){
             res.redirect("/blogs");
             console.log("Successfully Delete!")
