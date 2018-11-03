@@ -35,6 +35,19 @@ function createBlog(blog, res){
     });
 }
 
+function findBlog(id,res){
+    Blog.findById(id, function(err, foundBlog){
+        mongoose.Types.ObjectId.isValid(id) ? console.log("Id is valid") : console.log("ID is not valid");
+        if(!err){
+            res.render("show", {blog: foundBlog});
+            console.log(foundBlog);
+        }
+        else{
+            console.log("failed to find blog" + err);
+            res.redirect("/blogs");
+        }
+    });
+}
 
 //RESTFUL Routes
 
@@ -66,6 +79,13 @@ app.post("/blogs", function(req,res){
     blog = req.body.blog;
     createBlog(blog,res);
 });
+
+//Show Route
+app.get("/blogs/:id",function (req,res) {
+    var id = req.params.id;
+    console.log(id);
+    findBlog(id,res);
+  })
 
 app.listen(3000, function(){
     console.log("Server is running!");
