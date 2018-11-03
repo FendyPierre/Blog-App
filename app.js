@@ -22,9 +22,21 @@ var blogSchema = mongoose.Schema({
 
 var Blog = mongoose.model("Blog", blogSchema);
 
+function createBlog(blog, res){
+    Blog.create(blog, function(err, newBlog){
+        if(err){
+            res.render("new");
+        }
+        else{
+            res.redirect("/blogs");
+        }
+    });
+}
+
 
 //RESTFUL Routes
 
+//Index Route
 app.get("/blogs", function(req,res){
     Blog.find({}, function(err, blogs){
         if(err){
@@ -41,6 +53,16 @@ app.get("/", function(req,res){
     res.redirect("/blogs");
 });
 
+//New Route
+app.get("/blogs/new", function(req, res){
+    res.render("new");
+});
+
+//Create Route
+app.post("/blogs", function(req,res){
+    blog = req.body.blog;
+    createBlog(blog,res);
+});
 
 app.listen(3000, function(){
     console.log("Server is running!");
