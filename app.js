@@ -1,15 +1,17 @@
 //App config
-var  express     = require("express"),
-     mongoose    = require("mongoose")
-     bodyParser  = require("body-parser"),
-     path        = require("path"),
-     app         = express();
+var  express        = require("express"),
+     methodOverride = require("method-override"),
+     mongoose       = require("mongoose")
+     bodyParser     = require("body-parser"),
+     path           = require("path"),
+     app            = express();
 
      
 mongoose.connect("mongodb://localhost/blogapp");
 app.set("view engine", "ejs");
 app.use(express.static('public'));  
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
 
 
 //Mongoose Model Config
@@ -35,19 +37,6 @@ function createBlog(blog, res){
     });
 }
 
-function findBlog(id,res){
-    Blog.findById(id, function(err, foundBlog){
-        mongoose.Types.ObjectId.isValid(id) ? console.log("Id is valid") : console.log("ID is not valid");
-        if(!err){
-            res.render("show", {blog: foundBlog});
-            console.log(foundBlog);
-        }
-        else{
-            console.log("failed to find blog" + err);
-            res.redirect("/blogs");
-        }
-    });
-}
 
 //RESTFUL Routes
 
@@ -81,12 +70,69 @@ app.post("/blogs", function(req,res){
 });
 
 //Show Route
+
+function showBlog(id,res){
+    Blog.findById(id, function(err, foundBlog){
+        mongoose.Types.ObjectId.isValid(id) ? console.log("Id is valid") : console.log("ID is not valid");
+        if(!err){
+            res.render("show", {blog: foundBlog});
+            console.log(foundBlog);
+        }
+        else{
+            console.log("failed to find blog" + err);
+            res.redirect("/blogs");
+        }
+    });
+}  
+
 app.get("/blogs/:id",function (req,res) {
     var id = req.params.id;
-    console.log(id);
-    findBlog(id,res);
+    var page = "show";
+    showBlog(id,res, page);
   })
+
+
+  //Edit Route
+function editBlog(id,res){
+    Blog.findById(id, function(err, foundBlog){
+        mongoose.Types.ObjectId.isValid(id) ? console.log("Id is valid") : console.log("ID is not valid");
+        if(!err){
+            res.render("edit", {blog: foundBlog});
+            console.log(foundBlog);
+        }
+        else{
+            console.log("failed to find blog" + err);
+            res.redirect("/blogs");
+        }
+    });
+}
+
+  app.get("/blogs/:id/edit", function(req,res){
+      var id = req.params.id;
+      editBlog(id,res);
+  });
 
 app.listen(3000, function(){
     console.log("Server is running!");
 });
+
+//Update Route
+app.put("/blogs/:id", function(req, res){
+    var id = req.params.id
+    var blog = req.body.blog;
+    console.log();
+    updateBlog(id, blog, res)
+});
+
+
+function updateBlog(id,blog, res){
+    Blog.findByIdAndUpdate(id, blog, function(err, updatedBlog){
+        var path = "/blogs/" + id;
+        if(!err){
+            res.redirect(path);
+        }
+        else{
+            console.log("failed to update! ERROR: " + err);
+        }
+    });
+}
