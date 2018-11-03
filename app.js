@@ -136,3 +136,22 @@ function updateBlog(id,blog, res){
         }
     });
 }
+
+//Delete Route
+
+app.delete("/blogs/:id", function(req, res){
+    var id = req.params.id;
+    deleteBlog(id, res)
+});
+
+function deleteBlog(id, res){
+    Blog.findByIdAndDelete(id, function (err, callback) {
+        if(!err){
+            res.redirect("/blogs");
+            console.log("Successfully Delete!")
+        }
+        else{
+            console.log("Failed to delete blog! Error: " + err);
+        }
+      });
+}

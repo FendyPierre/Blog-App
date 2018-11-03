@@ -10,10 +10,12 @@
                 <div class="content">
                     <span><%= blog.created.toDateString() %></span>
                 </div>
-                <div>
+                <div class="description">
                     <p><%= blog.body %></p>
-                    <input class="ui blue big basic button" type="submit" placeholder="EDIT">
                 </div>
+                <form action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
+                    <button class="ui red basic button">Delete</button>
+                </form>
         </div>
 
     </div>
