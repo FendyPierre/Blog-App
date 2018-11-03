@@ -1,13 +1,14 @@
 //App config
-var  express    = require("express"),
-     mongoose   = require("mongoose")
-     bodyParser  = require("body-parser")
-     app        = express();
+var  express     = require("express"),
+     mongoose    = require("mongoose")
+     bodyParser  = require("body-parser"),
+     path        = require("path"),
+     app         = express();
 
      
 mongoose.connect("mongodb://localhost/blogapp");
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static('public'));  
 app.use(bodyParser.urlencoded({extended: true}));
 
 
@@ -39,9 +40,6 @@ app.get("/blogs", function(req,res){
 app.get("/", function(req,res){
     res.redirect("/blogs");
 });
-
-
-
 
 
 app.listen(3000, function(){
