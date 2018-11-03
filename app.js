@@ -23,9 +23,11 @@ var blogSchema = mongoose.Schema({
 var Blog = mongoose.model("Blog", blogSchema);
 
 function createBlog(blog, res){
+    console.log(blog);
     Blog.create(blog, function(err, newBlog){
         if(err){
             res.render("new");
+            console.log("failed to create new blog");
         }
         else{
             res.redirect("/blogs");
@@ -60,6 +62,7 @@ app.get("/blogs/new", function(req, res){
 
 //Create Route
 app.post("/blogs", function(req,res){
+    console.log(req.body);
     blog = req.body.blog;
     createBlog(blog,res);
 });
