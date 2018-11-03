@@ -1,10 +1,11 @@
 //App config
-var  express        = require("express"),
-     methodOverride = require("method-override"),
-     mongoose       = require("mongoose")
-     bodyParser     = require("body-parser"),
-     path           = require("path"),
-     app            = express();
+var  express             = require("express"),
+     expressSanitizer    = require("express-sanitizer"),
+     methodOverride      = require("method-override"),
+     mongoose            = require("mongoose")
+     bodyParser          = require("body-parser"),
+     path                = require("path"),
+     app                 = express();
 
      
 mongoose.connect("mongodb://localhost/blogapp");
@@ -12,6 +13,7 @@ app.set("view engine", "ejs");
 app.use(express.static('public'));  
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
+app.use(expressSanitizer());
 
 
 //Mongoose Model Config
@@ -23,20 +25,6 @@ var blogSchema = mongoose.Schema({
 });
 
 var Blog = mongoose.model("Blog", blogSchema);
-
-function createBlog(blog, res){
-    console.log(blog);
-    Blog.create(blog, function(err, newBlog){
-        if(err){
-            res.render("new");
-            console.log("failed to create new blog");
-        }
-        else{
-            res.redirect("/blogs");
-        }
-    });
-}
-
 
 //RESTFUL Routes
 
@@ -64,10 +52,26 @@ app.get("/blogs/new", function(req, res){
 
 //Create Route
 app.post("/blogs", function(req,res){
-    console.log(req.body);
+    console.log(req.body.blog.body);
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+    console.log(req.body.blog.body);
     blog = req.body.blog;
     createBlog(blog,res);
 });
+
+function createBlog(blog, res){
+    console.log(blog);
+    Blog.create(blog, function(err, newBlog){
+        if(err){
+            res.render("new");
+            console.log("failed to create new blog");
+        }
+        else{
+            res.redirect("/blogs");
+        }
+    });
+}
+
 
 //Show Route
 
@@ -118,6 +122,7 @@ app.listen(3000, function(){
 
 //Update Route
 app.put("/blogs/:id", function(req, res){
+    req.body.blog.body = req.sanitize(req.body.blog.body);
     var id = req.params.id
     var blog = req.body.blog;
     console.log();
